@@ -10,6 +10,41 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\Src\Actor.cpp" />
+    <ClCompile Include="..\Src\Buff.cpp" />
+    <ClCompile Include="..\Src\Collision.cpp" />
+    <ClCompile Include="..\Src\File_manager.cpp" />
+    <ClCompile Include="..\Src\Graphics_manager.cpp" />
+    <ClCompile Include="..\Src\Grid.cpp" />
+    <ClCompile Include="..\Src\Main.cpp" />
+    <ClCompile Include="..\Src\Object_manager.cpp" />
+    <ClCompile Include="..\Src\Player.cpp" />
+    <ClCompile Include="..\Src\Scene.cpp" />
+    <ClCompile Include="..\Src\Scene_manager.cpp" />
+    <ClCompile Include="..\Src\Skill.cpp" />
+    <ClCompile Include="..\Src\Stance_manager.cpp" />
+    <ClCompile Include="..\Src\Stats.cpp" />
+    <ClCompile Include="..\Src\Utils.cpp" />
+    <ClCompile Include="..\Src\Zone1.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\Src\Actor.hpp" />
+    <ClInclude Include="..\Src\Buff.hpp" />
+    <ClInclude Include="..\Src\Collision.hpp" />
+    <ClInclude Include="..\Src\File_manager.hpp" />
+    <ClInclude Include="..\Src\Graphics_manager.hpp" />
+    <ClInclude Include="..\Src\Grid.hpp" />
+    <ClInclude Include="..\Src\Object_manager.hpp" />
+    <ClInclude Include="..\Src\Player.hpp" />
+    <ClInclude Include="..\Src\Scene.hpp" />
+    <ClInclude Include="..\Src\Scene_manager.hpp" />
+    <ClInclude Include="..\Src\Skill.hpp" />
+    <ClInclude Include="..\Src\Stance_manager.hpp" />
+    <ClInclude Include="..\Src\Stats.hpp" />
+    <ClInclude Include="..\Src\Utils.hpp" />
+    <ClInclude Include="..\Src\Zone1.hpp" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
@@ -97,19 +132,6 @@ xcopy "$(SolutionDir)Extern\AlphaEngine_V3.09\lib\Alpha_Engine.dll" "$(OutDir)" 
 xcopy "$(SolutionDir)Extern\AlphaEngine_V3.09\lib\fmod.dll" "$(OutDir)" /s /r /y /q</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="Actor.cpp" />
-    <ClCompile Include="File_manager.cpp" />
-    <ClCompile Include="Grid.cpp" />
-    <ClCompile Include="Main.cpp" />
-    <ClCompile Include="Utils.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="Actor.hpp" />
-    <ClInclude Include="File_manager.hpp" />
-    <ClInclude Include="Grid.hpp" />
-    <ClInclude Include="Utils.hpp" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

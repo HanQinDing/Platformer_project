@@ -2,6 +2,7 @@
 
 static int** BINARY_COLLISION_ARRAY;
 
+
 /*!****************************
 	Allocate memory for array
 *******************************/

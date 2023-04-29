@@ -2,7 +2,11 @@
 // includes
 
 #include "AEEngine.h"
-
+#include "Zone1.hpp"
+#include "Utils.hpp"
+#include "Scene_manager.hpp"
+#include "Stance_manager.hpp"
+#include "Graphics_manager.hpp"
 
 
 // ---------------------------------------------------------------------------
@@ -22,39 +26,23 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	// Initialization of your own variables go here
 
 	// Using custom window procedure
-	AESysInit(hInstance, nCmdShow, 800, 600, 1, 60, true, NULL);
+	AESysInit(hInstance, nCmdShow, Window_size::WINDOW_WIDTH, Window_size::WINDOW_HEIGHT, 1, 60, true, NULL);
 
 	// Changing the window title
-	AESysSetWindowTitle("My New Demo!");
+	AESysSetWindowTitle("New RPG");
 
 	// reset the system modules
 	AESysReset();
-
-
+	Add_scene(ZONE1, &Zone1_load, &Zone1_initialize, &Zone1_update, &Zone1_draw, &Zone1_free, &Zone1_unload);
+	Load_mesh();
+	Load_texture();
+	Stance_mgr::Load_all_stance();
 
 	// Game Loop
-	while (gGameRunning)
-	{
-		// Informing the system about the loop's start
-		AESysFrameStart();
-
-		// Handling Input
-		AEInputUpdate();
-
-		// Your own update logic goes here
-
-
-		// Your own rendering logic goes here
-
-
-		// Informing the system about the loop's end
-		AESysFrameEnd();
-
-		// check if forcing the application to quit
-		if (AEInputCheckTriggered(AEVK_ESCAPE) || 0 == AESysDoesWindowExist())
-			gGameRunning = 0;
+	Start_scene();
+	while (!Get_quit()) {
+		Update_scene();
 	}
-
 
 	// free the system
 	AESysExit();

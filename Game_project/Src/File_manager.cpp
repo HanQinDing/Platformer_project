@@ -17,6 +17,13 @@ void Load_map_data(const char* file_name) {
 			for (int j = 0; j < Grid_size::GRID_WIDTH; ++j) {
 				ifs >> ID;
 				(ID == static_cast<int>(TYPE_WALL)) ? Set_cell_value(i, j, ID) : Set_cell_value(i, j, static_cast<int>(TYPE_EMPTY));
+
+				switch (static_cast<Object_type>(ID)) {
+					case TYPE_PLAYER: {
+						Player* p = new Player({static_cast<float>(i),static_cast<float>(j)});
+						Add_object(p);
+					}
+				}
 			}
 		}
 

@@ -2,8 +2,8 @@
 #include "Utils.hpp"
 
 namespace Grid_size {
-	int	GRID_WIDTH{ 0 };
-	int GRID_HEIGHT{ 0 };
+	static int	GRID_WIDTH;
+	static int  GRID_HEIGHT{ 0 };
 }
 
 void Load_array(int width, int height);
