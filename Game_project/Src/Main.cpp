@@ -34,9 +34,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	// reset the system modules
 	AESysReset();
 	Add_scene(ZONE1, &Zone1_load, &Zone1_initialize, &Zone1_update, &Zone1_draw, &Zone1_free, &Zone1_unload);
-	Load_mesh();
-	Load_texture();
-	Stance_mgr::Load_all_stance();
+	//Load_mesh();
+	//Load_texture();
+	//Stance_mgr::Load_all_stance();
 
 	// Game Loop
 	Start_scene();

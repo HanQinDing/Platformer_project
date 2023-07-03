@@ -1,7 +1,5 @@
 #pragma once
 #include "Utils.hpp"
-#include "File_manager.hpp"
-#include "Object_manager.hpp"
 
 void Zone1_load();
 

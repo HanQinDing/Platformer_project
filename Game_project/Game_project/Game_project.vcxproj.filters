@@ -15,16 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\Src\Graphics_manager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Src\Grid.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\Src\Main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Src\Player.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\Src\Scene.cpp">
@@ -39,38 +30,17 @@
     <ClCompile Include="..\Src\Zone1.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\Src\Actor.cpp">
+    <ClCompile Include="..\Src\Memory_manager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\Src\File_manager.cpp">
+    <ClCompile Include="..\Src\Base_Allocator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\Src\Object_manager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Src\Collision.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Src\Skill.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Src\Stats.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Src\Stance_manager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Src\Buff.cpp">
+    <ClCompile Include="..\Src\Linear_Allocator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\Src\Graphics_manager.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\Grid.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\Src\Scene.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -80,34 +50,16 @@
     <ClInclude Include="..\Src\Utils.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\Src\File_manager.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\Object_manager.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\Collision.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\Skill.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\Stats.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\Buff.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Src\Stance_manager.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\Src\Zone1.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\Src\Actor.hpp">
+    <ClInclude Include="..\Src\Memory_manager.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\Src\Player.hpp">
+    <ClInclude Include="..\Src\Base_Allocator.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Src\Linear_Allocator.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

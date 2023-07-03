@@ -11,37 +11,21 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\Src\Actor.cpp" />
-    <ClCompile Include="..\Src\Buff.cpp" />
-    <ClCompile Include="..\Src\Collision.cpp" />
-    <ClCompile Include="..\Src\File_manager.cpp" />
-    <ClCompile Include="..\Src\Graphics_manager.cpp" />
-    <ClCompile Include="..\Src\Grid.cpp" />
+    <ClCompile Include="..\Src\Base_Allocator.cpp" />
+    <ClCompile Include="..\Src\Linear_Allocator.cpp" />
     <ClCompile Include="..\Src\Main.cpp" />
-    <ClCompile Include="..\Src\Object_manager.cpp" />
-    <ClCompile Include="..\Src\Player.cpp" />
+    <ClCompile Include="..\Src\Memory_manager.cpp" />
     <ClCompile Include="..\Src\Scene.cpp" />
     <ClCompile Include="..\Src\Scene_manager.cpp" />
-    <ClCompile Include="..\Src\Skill.cpp" />
-    <ClCompile Include="..\Src\Stance_manager.cpp" />
-    <ClCompile Include="..\Src\Stats.cpp" />
     <ClCompile Include="..\Src\Utils.cpp" />
     <ClCompile Include="..\Src\Zone1.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\Src\Actor.hpp" />
-    <ClInclude Include="..\Src\Buff.hpp" />
-    <ClInclude Include="..\Src\Collision.hpp" />
-    <ClInclude Include="..\Src\File_manager.hpp" />
-    <ClInclude Include="..\Src\Graphics_manager.hpp" />
-    <ClInclude Include="..\Src\Grid.hpp" />
-    <ClInclude Include="..\Src\Object_manager.hpp" />
-    <ClInclude Include="..\Src\Player.hpp" />
+    <ClInclude Include="..\Src\Base_Allocator.hpp" />
+    <ClInclude Include="..\Src\Linear_Allocator.hpp" />
+    <ClInclude Include="..\Src\Memory_manager.hpp" />
     <ClInclude Include="..\Src\Scene.hpp" />
     <ClInclude Include="..\Src\Scene_manager.hpp" />
-    <ClInclude Include="..\Src\Skill.hpp" />
-    <ClInclude Include="..\Src\Stance_manager.hpp" />
-    <ClInclude Include="..\Src\Stats.hpp" />
     <ClInclude Include="..\Src\Utils.hpp" />
     <ClInclude Include="..\Src\Zone1.hpp" />
   </ItemGroup>
