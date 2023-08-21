@@ -5,7 +5,7 @@ void Zone1_load() {
 }
 
 void Zone1_initialize() {
-
+	Initialize_all_alocators();
 }
 
 void Zone1_update() {

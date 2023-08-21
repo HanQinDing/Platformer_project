@@ -13,6 +13,7 @@
   <ItemGroup>
     <ClCompile Include="..\Src\Base_Allocator.cpp" />
     <ClCompile Include="..\Src\Linear_Allocator.cpp" />
+    <ClCompile Include="..\Src\LList_Allocator.cpp" />
     <ClCompile Include="..\Src\Main.cpp" />
     <ClCompile Include="..\Src\Memory_manager.cpp" />
     <ClCompile Include="..\Src\Scene.cpp" />
@@ -23,6 +24,7 @@
   <ItemGroup>
     <ClInclude Include="..\Src\Base_Allocator.hpp" />
     <ClInclude Include="..\Src\Linear_Allocator.hpp" />
+    <ClInclude Include="..\Src\LList_Allocator.hpp" />
     <ClInclude Include="..\Src\Memory_manager.hpp" />
     <ClInclude Include="..\Src\Scene.hpp" />
     <ClInclude Include="..\Src\Scene_manager.hpp" />

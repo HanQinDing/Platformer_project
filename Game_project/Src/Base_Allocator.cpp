@@ -1,18 +1,24 @@
 #include "Base_Allocator.hpp"
 
-template<typename T>
-const typename BaseAllocator<T>::size_type& BaseAllocator<T>::GetSize() const noexcept {
+
+const std::size_t& BaseAllocator::GetSize() const noexcept {
 	return m_size;
 }
 
 
-template<typename T>
-const typename BaseAllocator<T>::size_type& BaseAllocator<T>::GetUsed() const noexcept {
+
+const std::size_t& BaseAllocator::GetUsed() const noexcept {
 	return m_usedBytes;
 }
 
-template<typename T>
-const typename BaseAllocator<T>::size_type& BaseAllocator<T>::GetNumAllocation() const noexcept {
+const std::size_t& BaseAllocator::GetFree() const noexcept {
+	std::cout << "Free: " << m_size - m_usedBytes << "\n";
+	return (m_size - m_usedBytes);
+}
+
+
+
+const std::size_t& BaseAllocator::GetNumAllocation() const noexcept {
 	return m_numAllocations;
 }
 
