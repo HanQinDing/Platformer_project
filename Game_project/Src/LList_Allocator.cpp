@@ -9,7 +9,8 @@ void ListAllocator::Initialise(std::size_t sz) noexcept {
 	BaseAllocator::m_size = sz;
 	BaseAllocator::m_usedBytes = 0;
 	BaseAllocator::m_numAllocations = 0;
-	std::cout << "Block Header Size: " << sizeof(Freeblock) << "\n";
+	std::cout << "Free Block Header Size: " << sizeof(Freeblock) << "\n";
+	std::cout << "Allocated Block Header Size: " << sizeof(Allocated_Block) << "\n";
 }
 
 void ListAllocator::Print_List() {

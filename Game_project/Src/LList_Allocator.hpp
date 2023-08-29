@@ -3,8 +3,13 @@
 #include <initializer_list>
 
 struct Freeblock {
-	int size{};
+	size_t size{};
 	Freeblock* next;
+};
+
+
+struct Allocated_Block {
+	size_t size{};
 };
 
 
@@ -67,8 +72,10 @@ template<typename T, std::size_t sz>
 T* ListAllocator::Allocate(const std::initializer_list<T>& initList) {
 
 	std::size_t count = (sz < initList.size()) ? initList.size() : sz;
+
 	std::size_t object_size = count * sizeof(T);
-	std::size_t size_required = sizeof(Freeblock) + object_size;
+	std::size_t padding = ( ( sizeof(Allocated_Block) + object_size) % 8 == 0) ? 0 : 8 - (( sizeof(Allocated_Block) + object_size) % 8);
+	std::size_t size_required = sizeof(Allocated_Block) + object_size + padding;
 
 	assert(size_required > 0 && BaseAllocator::m_usedBytes + size_required <= (BaseAllocator::m_size));
 
@@ -80,20 +87,22 @@ T* ListAllocator::Allocate(const std::initializer_list<T>& initList) {
 
 	while (FreeMem != nullptr) {
 
-		if (FreeMem->size >= size_required) { //Check if this memory block has enough space
+		if (FreeMem->size == size_required) { //Check if this memory block has enough space
+			BestFit = FreeMem;
+			break;
+		}
+		else if (FreeMem->size > size_required) { //Check if this memory block has enough space
 
 			if (BestFit) { //Check if we already have a best fit
 				if (BestFit->size < FreeMem->size) {
 					BestFit_Prev = PrevBlock;
 					BestFit = FreeMem; //Choose the Smallest memory block that is big enough to contain the objects
-
-					if (FreeMem->size == size_required) {
-						break;	//If we found a perfect match, we can stop looping
-					}
+					
 				}
 			}
 			else {
 				BestFit = FreeMem;
+
 			}
 		}
 		PrevBlock = FreeMem;
@@ -101,11 +110,14 @@ T* ListAllocator::Allocate(const std::initializer_list<T>& initList) {
 	}
 
 	if (!BestFit) { //Unable to find a fitting memory block 
-		std::cout << "NO SPACE\n";
 		return nullptr;
 	}
 
-	T* start = reinterpret_cast<T*>(BestFit + 1);
+	size_t Block_size = BestFit->size;
+	Freeblock* next_block = BestFit->next;
+
+	Allocated_Block* head = reinterpret_cast<Allocated_Block*>(reinterpret_cast<char*>(BestFit) + padding);
+	T* start = reinterpret_cast<T*>(head + 1);
 	T* end = start + count;
 	T* construct_p = start;
 
@@ -115,32 +127,34 @@ T* ListAllocator::Allocate(const std::initializer_list<T>& initList) {
 	}
 
 	while (construct_p != end) {
-		*(construct_p) = T();
+		new (construct_p) T();
 		++construct_p;
 	}
 
-	if (BestFit->size > size_required) { //Memmory block size is larger that what we need, we will put back the leftover free memories.
+	if (Block_size > size_required) { //Memmory block size is larger that what we need, we will put back the leftover free memories.
 		Freeblock* newfree_block = reinterpret_cast<Freeblock*>(end);
-		newfree_block->size = BestFit->size - (size_required);
-		newfree_block->next = BestFit->next;
-
+		newfree_block->size = Block_size - (size_required);
+		newfree_block->next = next_block;
+	
 		if (BestFit_Prev) {
 			BestFit_Prev->next = newfree_block;
 		}
 		else {	//The memory we allcoated is at the start of the list.
 			Free_Blocks_List = newfree_block;
+			
 		}
 	}
 	else {
 		if (BestFit_Prev) {
-			BestFit_Prev->next = BestFit->next;
+			BestFit_Prev->next = next_block;
 		}
 		else {	//The memory we allcoated is at the start of the list.
-			Free_Blocks_List = BestFit->next;
+			Free_Blocks_List = next_block;
 		}
 	}
-	BestFit->next = reinterpret_cast<Freeblock*>(end);
-	BestFit->size = size_required;
+
+	//Block_size->next = reinterpret_cast<Freeblock*>(end);
+	head->size = size_required;
 
 
 	++BaseAllocator::m_numAllocations;
@@ -157,7 +171,7 @@ T* ListAllocator::Allocate(const std::initializer_list<T>& initList) {
 */
 template<typename T>
 T* ListAllocator::Allocate(T& object) {
-	std::size_t size_required = sizeof(Freeblock) + sizeof(T);
+	std::size_t size_required = sizeof(Allocated_Block) + sizeof(T);
 
 	assert(size_required > 0 && BaseAllocator::m_usedBytes + size_required <= (BaseAllocator::m_size));
 
@@ -170,22 +184,23 @@ T* ListAllocator::Allocate(T& object) {
 
 	while (FreeMem != nullptr) {
 
-		if (FreeMem->size >= size_required) { //Check if this memory block has enough space
+		if (FreeMem->size == size_required) { //Check if this memory block has enough space
+			BestFit = FreeMem;
+			break;
+		}
+		else if (FreeMem->size > size_required) { //Check if this memory block has enough space
 
 			if (BestFit) { //Check if we already have a best fit
 				if (BestFit->size < FreeMem->size) {
 					BestFit_Prev = PrevBlock;
 					BestFit = FreeMem; //Choose the Smallest memory block that is big enough to contain the objects
-
-					if (FreeMem->size == size_required) {
-						break;	//If we found a perfect match, we can stop looping
-					}
 				}
 			}
 			else {
 				BestFit = FreeMem;
 			}
 		}
+
 		PrevBlock = FreeMem;
 		FreeMem = FreeMem->next;
 	}
@@ -194,13 +209,14 @@ T* ListAllocator::Allocate(T& object) {
 		return nullptr;
 	}
 
-	T* start = static_cast<T*>(BestFit + 1);
+	Allocated_Block* head = reinterpret_cast<Allocated_Block*>(BestFit);
+	T* start = reinterpret_cast<T*>(head + 1);
 	T* end = start + 1;
 	*start = object;
 
 
 	if (BestFit->size > size_required) { //Memmory block size is larger that what we need, we will put back the leftover free memories.
-		Freeblock* newfree_block = static_cast<Freeblock*>(end);
+		Freeblock* newfree_block = reinterpret_cast<Freeblock*>(end);
 		newfree_block->size = BestFit->size - (size_required);
 		newfree_block->next = BestFit->next;
 		if (BestFit_Prev) {
@@ -219,7 +235,7 @@ T* ListAllocator::Allocate(T& object) {
 		}
 	}
 
-	BestFit->next = static_cast<Freeblock*>(end);
+	BestFit->next = reinterpret_cast<Freeblock*>(end);
 	BestFit->size = size_required;
 
 	++BaseAllocator::m_numAllocations;

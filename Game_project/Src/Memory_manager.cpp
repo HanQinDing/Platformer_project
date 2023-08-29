@@ -13,21 +13,50 @@ void Initialize_all_alocators() {
 	//std::cout << "Used: " << Test_allocator.GetUsed() << "\n";
 	//std::cout << "\n";
 
-	Test_allocator.Initialise(1000);
+	Test_allocator.Initialise(10000);
+	/*test_Obj a{}, b{}, c{};
+	initializer_list*/
+	//test_Obj* t2 = new test_Obj[100];
+	//test_Obj* t = Test_allocator.Allocate<test_Obj, 100>();
 
 	auto startTime = std::chrono::high_resolution_clock::now();
 
-	test_Obj* test2 = new test_Obj[10];
+	test_Obj* test2 = new test_Obj[100];
 	auto endTime = std::chrono::high_resolution_clock::now();
 
-	test_Obj* test = Test_allocator.Allocate<test_Obj,10>();
+	//int* test4 = Test_allocator.Allocate<int>({ 10 });
+
+	
+
+	test_Obj* test = Test_allocator.Allocate<test_Obj,100>();
 	auto endTime2 = std::chrono::high_resolution_clock::now();
+
+	Test_allocator.Print_List();
+
+//	test_Obj* test5 = Test_allocator.Allocate<test_Obj, 100>();
+
+
 
 	auto first_duration = std::chrono::duration_cast<std::chrono::microseconds>(endTime - startTime);
 	auto second_duration = std::chrono::duration_cast<std::chrono::microseconds>(endTime2 - endTime);
 
+	std::cout << sizeof(test_Obj);
 	std::cout << "ALLOCATOR TIME: " << second_duration.count() << "\n";
-	std::cout << "NEW TIME: " << first_duration.count() << "\n";
+	std::cout << "NEW TIME: " << first_duration.count() << "\n\n\n";
+
+	test_Obj* check = test2;
+	for (int i{ 0 }; i < 10; ++i) {
+		std::cout << check->c << "\n";
+		++check;
+	}
+
+	std::cout << "\n\n\n" ;
+	check = test;
+	for (int i{ 0 }; i < 10; ++i) {
+		std::cout << check->c << "\n";
+		++check;
+	}
+
 
 	/*int* test =  Test_allocator.Allocate<int, 20>();
 
