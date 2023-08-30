@@ -71,14 +71,16 @@ protected:
 template<typename T, std::size_t sz>
 T* ListAllocator::Allocate(const std::initializer_list<T>& initList) {
 
+	//Determine the actual memory size needed (object + header)
 	std::size_t count = (sz < initList.size()) ? initList.size() : sz;
-
 	std::size_t object_size = count * sizeof(T);
 	std::size_t padding = ( ( sizeof(Allocated_Block) + object_size) % 8 == 0) ? 0 : 8 - (( sizeof(Allocated_Block) + object_size) % 8);
 	std::size_t size_required = sizeof(Allocated_Block) + object_size + padding;
 
 	assert(size_required > 0 && BaseAllocator::m_usedBytes + size_required <= (BaseAllocator::m_size));
 
+
+	//Traverse through the List to find the Best suitable Memory block
 	Freeblock* PrevBlock = nullptr;
 	Freeblock* FreeMem = Free_Blocks_List;
 
@@ -113,49 +115,49 @@ T* ListAllocator::Allocate(const std::initializer_list<T>& initList) {
 		return nullptr;
 	}
 
-	size_t Block_size = BestFit->size;
-	Freeblock* next_block = BestFit->next;
-
+	// Take out the memory chunk from the list 
+	// Only take out the amount we need
+	// The remainder will be place back into the list
 	Allocated_Block* head = reinterpret_cast<Allocated_Block*>(reinterpret_cast<char*>(BestFit) + padding);
 	T* start = reinterpret_cast<T*>(head + 1);
 	T* end = start + count;
-	T* construct_p = start;
 
-	for (const T& obj : initList) {
-		*(construct_p) = obj;
-		++construct_p;
-	}
-
-	while (construct_p != end) {
-		new (construct_p) T();
-		++construct_p;
-	}
-
-	if (Block_size > size_required) { //Memmory block size is larger that what we need, we will put back the leftover free memories.
+	if (BestFit->size > size_required) { //Memmory block size is larger that what we need, we will put back the leftover free memories.
 		Freeblock* newfree_block = reinterpret_cast<Freeblock*>(end);
-		newfree_block->size = Block_size - (size_required);
-		newfree_block->next = next_block;
-	
+		newfree_block->size = BestFit->size - (size_required);
+		newfree_block->next = BestFit->next;
+
 		if (BestFit_Prev) {
 			BestFit_Prev->next = newfree_block;
 		}
 		else {	//The memory we allcoated is at the start of the list.
 			Free_Blocks_List = newfree_block;
-			
+
 		}
 	}
 	else {
 		if (BestFit_Prev) {
-			BestFit_Prev->next = next_block;
+			BestFit_Prev->next = BestFit->next;
 		}
 		else {	//The memory we allcoated is at the start of the list.
-			Free_Blocks_List = next_block;
+			Free_Blocks_List = BestFit->next;
 		}
 	}
 
-	//Block_size->next = reinterpret_cast<Freeblock*>(end);
-	head->size = size_required;
 
+	// Fill up the Allocated memory block with objects
+	T* construct_p = start;
+
+	for (const T& obj : initList) {	//Fill up the memory block with objects from initializer_list
+		*(construct_p) = obj;
+		++construct_p;
+	}
+
+	while (construct_p != end) {	// Initialize objects into the rest of the Memory Chunk
+		new (construct_p) T();
+		++construct_p;
+	}
+	head->size = size_required;
 
 	++BaseAllocator::m_numAllocations;
 	BaseAllocator::m_usedBytes += size_required;

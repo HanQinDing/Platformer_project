@@ -16,8 +16,11 @@ void Initialize_all_alocators() {
 	Test_allocator.Initialise(10000);
 	/*test_Obj a{}, b{}, c{};
 	initializer_list*/
-	//test_Obj* t2 = new test_Obj[100];
-	//test_Obj* t = Test_allocator.Allocate<test_Obj, 100>();
+	test_Obj* t2 = new test_Obj[100];
+	test_Obj* t = Test_allocator.Allocate<test_Obj, 100>();
+
+	/*test_Obj* t3 = new test_Obj[100];
+	test_Obj* t4 = Test_allocator.Allocate<test_Obj, 100>();*/
 
 	auto startTime = std::chrono::high_resolution_clock::now();
 
