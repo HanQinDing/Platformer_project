@@ -18,7 +18,7 @@ struct test_Obj {
 	char d{};
 	
 	~test_Obj() {
-		std::cout << "DESTROYED\n";
+		//std::cout << "DESTROYED\n";
 	}
 	test_Obj() {	
 		std::random_device rd;  // Seed the engine with a random device

@@ -3,6 +3,7 @@
 
 void ListAllocator::Initialise(std::size_t sz) noexcept {
 	BaseAllocator::start = new void* [sz];
+	Memory_end = reinterpret_cast<char*>(BaseAllocator::start) + sz;
 	Free_Blocks_List = static_cast<Freeblock*>(BaseAllocator::start);
 	Free_Blocks_List->next = nullptr;
 	Free_Blocks_List->size = sz;
