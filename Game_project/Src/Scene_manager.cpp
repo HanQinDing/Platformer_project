@@ -22,6 +22,10 @@ void Start_scene() {
 void Update_scene() {
 	AESysFrameStart();
 	AEInputUpdate();
+
+	if (AEInputCheckTriggered(AEVK_ESCAPE)) {
+		Quit_game();
+	}
 	Gsm::gsm.gs_array[Gsm::gsm.current_scene].Scene_update();
 	Gsm::gsm.gs_array[Gsm::gsm.current_scene].Scene_draw();
 	AESysFrameEnd();

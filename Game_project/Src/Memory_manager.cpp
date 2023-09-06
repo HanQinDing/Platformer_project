@@ -1,31 +1,154 @@
+/*!************************************************************************
+\file Memory_manager.cpp
+\author Han Qin Ding
+
+\brief
+This file contains functions for a memory manager system.
+You can allocate/deallocate dynamic memory through this memory manager.
+You can also print out details of each of the allocators.
+By default, we will be using our custom allocator. (not std::allocator)
+
+Functions you can use:
+
+	- InitializeAllAlocators();
+		initialize all the allocators in the memory manager
+
+	- FreeAllAlocators();
+		Free all the memories that were allocated in the memory manager
+
+	- PrintAllDetails();
+		Print out the details of all of the allocators in the memory manager
+
+	- void ChangeAllocator(bool useCustomAllocator);
+		In the event that the custom allocator does not work, you can call this
+		function right after InitializeAllAlocators() to switch to std::allocator.
+		You can proceed to use the other functions as normal
+
+		template<typename T, std::size_t sz >
+	- T* Reserve(const std::initializer_list<T>& initList);
+		Call this function you want to allocate a memory for an array of objects and you already have an initializer list.
+		Enter the object type in the < >
+
+		template<typename T, std::size_t sz >
+	- T* Reserve(const std::initializer_list<T>& initList);
+		Call this function you want to allocate a memory for an array of objects but you only know the array size.
+		Enter the object type and the array size in the < >
+
+		template<typename T>
+	- T* Reserve(T& obj);
+		Call this function you want to allocate a memory 1 lvalue object.
+		Enter the object type in the < >
+
+		template<typename T>
+	- T* Reserve(const T& obj);
+		 Call this function you want to allocate a memory 1 rvalue object.
+		 Enter the object type in the < >
+
+		template<typename T, ALLOCATOR_TYPE allocatorType = LIST_ALLOCATOR>
+	- void Return(T*&);
+		Call this function when you want to free a dynamic allcoated memory
+		you can just pass in the pointer into the function param
+		IF YOU PASS IN AN INVALID MEMORY OR A MEMORY THATS NOT ALLOCATED BY THIS MEMORY MANAGER, IT WILL PRINT OUT ERROR MESSAGE
+
+
+
+EXAMPLE ON HOW TO ALLOCATE:
+
+			[ Allocate memory for single object ]
+	 1. int* ptr = Reserve<int>( obj );  // allocating memory for 1 int object
+
+			[ Allocate memory for an array ( using initializer list ) ]
+	 2. int* array = Reserve<int>( initializer_list );  // allocating memory for an array filled with objects from initializer list
+
+			[ Allocate memory for an array ( using array size ) ]
+	 3. int* array = Reserve< int, 20 >( );  // allocating memory for an array of size 20. All objects inside are default constructed
+
+
+EXAMPLE ON HOW TO DEALLOCATE:
+
+			[ Deallocate memory for any memory that was dynamically allocated by memory manager ]
+	 1. Return( ptr );  // You just need to pass in the pointer, the allocator will know if its an array or a single object
+
+**************************************************************************/
 #include "Memory_manager.hpp"
 #include <chrono>
+#include <algorithm>
+#include <Windows.h>
+#include <sstream>
+
+namespace CustomAllocators
+{
+	ListAllocator g_listAllocator;
+	LinearAllocator g_linearAllocator;
+	bool g_useMyAllocator{ true };
+  std::vector<void*>g_arrayMem;
+  std::vector<void*>g_objMem;
+}
 
 
-ListAllocator Test_allocator;
+
+/************************************************************************/ /*!
+\ brief
+Initialize all the Allocators in the memory manager.
+*/
+/************************************************************************/
+void InitializeAllAlocators()
+{
+	CustomAllocators::g_linearAllocator.Initialise(100);
+	CustomAllocators::g_listAllocator.Initialise(10000000);
+
+}
+
+/************************************************************************/ /*!
+\ brief
+Free all the Allocators in the memory manager.
+*/
+/************************************************************************/
+void FreeAllAlocators() 
+{
+	if (CustomAllocators::g_useMyAllocator) 
+	{
+		CustomAllocators::g_linearAllocator.PrintMemLeak();
+		CustomAllocators::g_listAllocator.PrintMemLeak();
+	}
+	else
+	{
+		PrintMemLeak();
+	}
+
+	CustomAllocators::g_linearAllocator.Free();
+	CustomAllocators::g_listAllocator.Free();
+	//for (void* v : CustomAllocators::g_arrayMem) {
+	//	delete[] v;
+	//}
+	//for (void* v : CustomAllocators::g_objMem) {
+	//	delete v;
+	//}
+}
 
 
 
-void Initialize_all_alocators() {
+/************************************************************************/ /*!
+\ brief
+Print out the details of all the Allocators in the memory manager
+*/
+/************************************************************************/
+void PrintAllDetails() 
+{
+	CustomAllocators::g_linearAllocator.PrintDetails();
+	CustomAllocators::g_listAllocator.PrintDetails();
+}
 
-	//std::cout << "Before Allcoation\n";
-	//std::cout << "Size: " << Test_allocator.GetSize() << "\n";
-	//std::cout << "Used: " << Test_allocator.GetUsed() << "\n";
-	//std::cout << "\n";
-
-	Test_allocator.Initialise(10000);
-
-	//int* Atest = Test_allocator.Reserve<int, 20>();
-
-	/*test_Obj a{}, b{}, c{};
-	initializer_list*/
-//	test_Obj* t2 = new test_Obj[100];
-//	test_Obj* t = Test_allocator.Reserve<test_Obj, 100>();
-//
-//	/*test_Obj* t3 = new test_Obj[100];
-//	test_Obj* t4 = Test_allocator.Reserve<test_Obj, 100>();*/
-//
-//	auto startTime = std::chrono::high_resolution_clock::now();
+/************************************************************************/ /*!
+\ brief
+This function is used for testing all the allocators in the memory manager.
+It will put test objects into each allocator to test if they are working fine
+(this function is used for testing and debugging)
+*/
+/************************************************************************/
+void TestAllAllocators()
+{
+	//	auto startTime = std::chrono::high_resolution_clock::now();
 //
 //	test_Obj* test2 = new test_Obj[100];
 //	auto endTime = std::chrono::high_resolution_clock::now();
@@ -49,270 +172,84 @@ void Initialize_all_alocators() {
 //	std::cout << sizeof(test_Obj);
 //	std::cout << "ALLOCATOR TIME: " << second_duration.count() << "\n";
 //	std::cout << "NEW TIME: " << first_duration.count() << "\n\n\n";
-//
-//	test_Obj* check = test2;
-//	for (int i{ 0 }; i < 10; ++i) {
-//		std::cout << check->c << "\n";
-//		++check;
-//	}
-//
-//	std::cout << "\n\n\n" ;
-//	check = test;
-//	for (int i{ 0 }; i < 10; ++i) {
-//		std::cout << check->c << "\n";
-//		++check;
-//	}
-//	std::cout << "\n\n";
-	//Test_allocator.Return(test);
-
-	test_Obj sample{};
-
-	auto startTime = std::chrono::high_resolution_clock::now();
-
-
-	////std::cout << "TESTOBJ SIZE: " << sizeof(test_Obj) << "\n";
-	//int* test =  Test_allocator.Reserve<int, 20>();
-
-	//std::cout << "Size: " << Test_allocator.GetSize() << "\n";
-	//std::cout << "Used: " << Test_allocator.GetUsed() << "\n";
-	//Test_allocator.GetFree();
-	//Test_allocator.Print_List();
-
-
-	//float* test2 =  Test_allocator.Reserve<float, 10>();
-
-	//std::cout << "Size: " << Test_allocator.GetSize() << "\n";
-	//std::cout << "Used: " << Test_allocator.GetUsed() << "\n";
-	//Test_allocator.GetFree();
-	//Test_allocator.Print_List();
-
-	//double* test3 = Test_allocator.Reserve<double, 10>();
-
-	//std::cout << "Size: " << Test_allocator.GetSize() << "\n";
-	//std::cout << "Used: " << Test_allocator.GetUsed() << "\n";
-	//Test_allocator.GetFree();
-	//Test_allocator.Print_List();
-
-
-	//char* test4 = Test_allocator.Reserve<char, 5>();
-
-	//std::cout << "Size: " << Test_allocator.GetSize() << "\n";
-	//std::cout << "Used: " << Test_allocator.GetUsed() << "\n";
-	//Test_allocator.GetFree();
-	//Test_allocator.Print_List();
-
-
-	//test_Obj* test5 = Test_allocator.Reserve<test_Obj, 201>();
-
-	//std::cout << "Size: " << Test_allocator.GetSize() << "\n";
-	//std::cout << "Used: " << Test_allocator.GetUsed() << "\n";
-	//Test_allocator.GetFree();
-	//Test_allocator.Print_List();
-	//
-
-	//Point* test6 = Test_allocator.Reserve<Point, 5>();
-
-	//std::cout << "Size: " << Test_allocator.GetSize() << "\n";
-	//std::cout << "Used: " << Test_allocator.GetUsed() << "\n";
-	//Test_allocator.GetFree();
-	//Test_allocator.Print_List();
-
-	int* test = new int[20];
-	float* test2 = new float[10];
-	double* test3 =new double[10];
-	char* test4 = new char[5];
-	test_Obj* test5 = new test_Obj[201];
-	Point* test6 = new Point[5];
-
-	//test_Obj* test = new test_Obj(sample);
-	//delete test;
-
-	//std::cout << "REWIND\n";
-	delete [] test5;
-	delete[] test;
-	delete[] test3;
-	delete[] test6;
-	delete[] test2;
-	delete[] test4;
-
-	/*Test_allocator.Return(test5);
-	std::cout << "Size: " << Test_allocator.GetSize() << "\n";
-	std::cout << "Used: " << Test_allocator.GetUsed() << "\n";
-	Test_allocator.GetFree();
-	Test_allocator.Print_List();
-
-	Test_allocator.Return(test);
-	std::cout << "Size: " << Test_allocator.GetSize() << "\n";
-	std::cout << "Used: " << Test_allocator.GetUsed() << "\n";
-	Test_allocator.GetFree();
-	Test_allocator.Print_List();
-
-	Test_allocator.Return(test3);
-	std::cout << "Size: " << Test_allocator.GetSize() << "\n";
-	std::cout << "Used: " << Test_allocator.GetUsed() << "\n";
-	Test_allocator.GetFree();
-	Test_allocator.Print_List();
-
-	Test_allocator.Return(test6);
-	std::cout << "Size: " << Test_allocator.GetSize() << "\n";
-	std::cout << "Used: " << Test_allocator.GetUsed() << "\n";
-	Test_allocator.GetFree();
-	Test_allocator.Print_List();
-
-
-	Test_allocator.Return(test2);
-	std::cout << "Size: " << Test_allocator.GetSize() << "\n";
-	std::cout << "Used: " << Test_allocator.GetUsed() << "\n";
-	Test_allocator.GetFree();
-	Test_allocator.Print_List();
-
-	Test_allocator.Return(test4);
-	std::cout << "Size: " << Test_allocator.GetSize() << "\n";
-	std::cout << "Used: " << Test_allocator.GetUsed() << "\n";
-	Test_allocator.GetFree();
-	Test_allocator.Print_List();*/
-
-	//Test_allocator.Return(test4);
-	//std::cout << "Size: " << Test_allocator.GetSize() << "\n";
-	//std::cout << "Used: " << Test_allocator.GetUsed() << "\n";
-	//Test_allocator.GetFree();
-	//Test_allocator.Print_List();
-
-	auto endTime = std::chrono::high_resolution_clock::now();
-
-	int* Atest = Test_allocator.Reserve<int>(10);
-	float* Atest2 = Test_allocator.Reserve<float, 10>();
-	double* Atest3 = Test_allocator.Reserve<double, 10>();
-	char* Atest4 = Test_allocator.Reserve<char, 5>();
-	test_Obj* Atest5 = Test_allocator.Reserve<test_Obj, 201>();
-	Point* Atest6 = Test_allocator.Reserve<Point, 5>();
-	//test_Obj* Atest = Test_allocator.Reserve<test_Obj>(sample);
-	//Test_allocator.Return(Atest);
-
-	////std::cout << "REWIND\n";
-	Test_allocator.Return(Atest5);
-	Test_allocator.Return(Atest);
-	Test_allocator.Return(Atest3);
-	Test_allocator.Return(Atest6);
-	Test_allocator.Return(Atest2);
-	Test_allocator.Return(Atest4);
-
-
-
-
-	auto endTime2 = std::chrono::high_resolution_clock::now();
-
-	auto first_duration = std::chrono::duration_cast<std::chrono::microseconds>(endTime - startTime);
-	auto second_duration = std::chrono::duration_cast<std::chrono::microseconds>(endTime2 - endTime);
-
-	std::cout << "ALLOCATOR TIME: " << second_duration.count() << "\n";
-	std::cout << "NEW TIME: " << first_duration.count() << "\n"; 
-
-	/*auto startTime = std::chrono::high_resolution_clock::now();
-
-	test_Obj* test2 = new test_Obj();
-	auto endTime = std::chrono::high_resolution_clock::now();
-
-	test_Obj* test = Test_allocator.Reserve<test_Obj>();
-	auto endTime2 = std::chrono::high_resolution_clock::now();
-
-	auto first_duration = std::chrono::duration_cast<std::chrono::microseconds>(endTime - startTime);
-	auto second_duration = std::chrono::duration_cast<std::chrono::microseconds>(endTime2 - endTime);
-
-	std::cout << "ALLOCATOR TIME: " << second_duration.count() << "\n";
-	std::cout << "NEW TIME: " << first_duration.count() << "\n";*/
-
-	////int* test = Test_allocator.Reserve<int>(1);
-	//////int* test = Test_allocator.Reserve<int>(10);
-	////
-	////std::cout << "After Allcoation\n";
-	////std::cout << "Size: " << Test_allocator.GetSize() << "\n";
-	////std::cout << "Used: " << Test_allocator.GetUsed() << "\n";
-
-
-	//test_Obj* pr = test;
-	//if (test) {
-	//	for (int i{ 0 }; i < 10; ++i) {
-	//		std::cout << "TEST Value: " << pr->p.x << "," << pr->p.y << "\n";
-	//		++pr;
-	//	}
-	//	
-	//}
-	//std::cout << "\n";
-	//
-	//test_Obj testo{};
-	//testo.~test_Obj();
-
- //  Test_allocator.Return(test);
-
-	//std::cout << "After Deallcoation\n";
-	//std::cout << "Size: " << Test_allocator.GetSize() << "\n";
-	//std::cout << "Used: " << Test_allocator.GetUsed() << "\n";
-	//if (test) {
-	//	std::cout << "TEST Value: " << *test << "\n";
-	//}
-	//std::cout << "\n";
-
-	//Float_allocator.Initialise(20);
-	//Double_allocator.Initialise(30);
 }
 
-//LinearAllocator Test_allocator;
-//
-//void Initialize_all_alocators() {
-//
-//	//std::cout << "Before Allcoation\n";
-//	//std::cout << "Size: " << Test_allocator.GetSize() << "\n";
-//	//std::cout << "Used: " << Test_allocator.GetUsed() << "\n";
-//	//std::cout << "\n";
-//
-//	Test_allocator.Initialise(1000000);
-//
-//	auto startTime = std::chrono::high_resolution_clock::now();
-//
-//	test_Obj* test2 = new test_Obj();
-//	auto endTime = std::chrono::high_resolution_clock::now();
-//
-//	test_Obj* test = Test_allocator.Reserve<test_Obj>();
-//	auto endTime2 = std::chrono::high_resolution_clock::now();
-//
-//	auto first_duration = std::chrono::duration_cast<std::chrono::microseconds>(endTime - startTime);
-//	auto second_duration = std::chrono::duration_cast<std::chrono::microseconds>(endTime2 - endTime);
-//
-//	std::cout << "ALLOCATOR TIME: " << second_duration.count() << "\n";
-//	std::cout << "NEW TIME: " << first_duration.count() << "\n";
-//
-//	////int* test = Test_allocator.Reserve<int>(1);
-//	//////int* test = Test_allocator.Reserve<int>(10);
-//	////
-//	////std::cout << "After Allcoation\n";
-//	////std::cout << "Size: " << Test_allocator.GetSize() << "\n";
-//	////std::cout << "Used: " << Test_allocator.GetUsed() << "\n";
-//
-//
-//	//test_Obj* pr = test;
-//	//if (test) {
-//	//	for (int i{ 0 }; i < 10; ++i) {
-//	//		std::cout << "TEST Value: " << pr->p.x << "," << pr->p.y << "\n";
-//	//		++pr;
-//	//	}
-//	//	
-//	//}
-//	//std::cout << "\n";
-//	//
-//	//test_Obj testo{};
-//	//testo.~test_Obj();
-//
-// //  Test_allocator.Return(test);
-//
-//	//std::cout << "After Deallcoation\n";
-//	//std::cout << "Size: " << Test_allocator.GetSize() << "\n";
-//	//std::cout << "Used: " << Test_allocator.GetUsed() << "\n";
-//	//if (test) {
-//	//	std::cout << "TEST Value: " << *test << "\n";
-//	//}
-//	//std::cout << "\n";
-//
-//	//Float_allocator.Initialise(20);
-//	//Double_allocator.Initialise(30);
-//}
+/************************************************************************/ /*!
+\ brief
+This function will be called if you want to change the allocator we are using.
+In the event that the custom allocator does not work properly, we will go back to std::allocator instead
+
+\param useCustomAllocator
+	bool variable to determine whether to use our custom allocator or go back to std::allocator (new, delete)
+*/
+/************************************************************************/
+void ChangeAllocator(bool useCustomAllocator) 
+{
+	CustomAllocators::g_useMyAllocator = useCustomAllocator;
+}
+
+void AddMemStd(void* ptr, bool isArray) 
+{
+	if (isArray) 
+	{
+		CustomAllocators::g_arrayMem.push_back(ptr);
+	}
+	else 
+	{
+		CustomAllocators::g_objMem.push_back(ptr);
+	}
+}
+
+/************************************************************************/ /*!
+\ brief
+Checks if the memory is for an array or an object
+
+\param [ptr]void*
+	pointer to the allocated memory
+
+\return
+ bool variable to determine whether to the memory is for an array or an object
+*/
+/************************************************************************/
+bool isArrayMem(void* ptr) 
+{
+
+	//Check if the ptr is an Array ptr
+	std::vector<void*>::iterator it{ std::find(CustomAllocators::g_arrayMem.begin(), CustomAllocators::g_arrayMem.end(), ptr) };
+
+	if (it != CustomAllocators::g_arrayMem.end()) 
+	{
+		CustomAllocators::g_arrayMem.erase(it);
+		return true;
+	}
+
+	it = std::find(CustomAllocators::g_objMem.begin(), CustomAllocators::g_objMem.end(), ptr);
+	CustomAllocators::g_objMem.erase(it);
+	return false;
+}
+
+
+/************************************************************************/ /*!
+\ brief
+Prints out the details of the memory leaks if any.
+*/
+/************************************************************************/
+void PrintMemLeak()
+{
+	if ((CustomAllocators::g_arrayMem.size() != 0) || (CustomAllocators::g_objMem.size() != 0))
+	{
+		OutputDebugStringA("\n std::Allocator Mem Leak:\n");
+		OutputDebugStringA("---------------------------------------------\n");
+		if (CustomAllocators::g_arrayMem.size() != 0)
+		{ // We will print mem leak details if required
+			std::string output = "Number of Arrays not free: " + std::to_string(CustomAllocators::g_arrayMem.size()) + "\n";
+			OutputDebugStringA(output.c_str());
+		}
+		if (CustomAllocators::g_objMem.size() != 0)
+		{ // We will print mem leak details if required
+			std::string output = "Number of Objects not free: " + std::to_string(CustomAllocators::g_objMem.size()) + "\n";
+			OutputDebugStringA(output.c_str());
+		}
+		OutputDebugStringA("----------------------------------------------\n\n");
+	}
+}

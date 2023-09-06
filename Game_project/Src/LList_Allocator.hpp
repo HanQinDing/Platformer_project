@@ -1,3 +1,13 @@
+/*!************************************************************************
+\file ListAllocator.hpp
+\author Han Qin Ding
+
+\brief
+This file functions for a linked list Allocator.
+The allocator uses a linked list to keep track of how many free memory chunks left in the allocator,
+and the size of each free meory chunk
+**************************************************************************/
+
 #pragma once
 #include "Base_Allocator.hpp"
 #include <initializer_list>
@@ -36,42 +46,48 @@ class ListAllocator : public BaseAllocator
 		template<typename T>
 		T* Reserve(const T& object);
 
-
-
-		//void Free() override;
-
 		template<typename T>
 		void Return(T*& ptr) noexcept;
 
 		void Initialise(std::size_t sz) noexcept;
-		void PrintDetails();
+		virtual void Free() override;
 
+		virtual void PrintDetails() override;
+		virtual void PrintMemLeak() override;
 
 
 	protected:
 
-		FreeBlock* m_freeMemList;
-		char* m_memEnd;
+		FreeBlock* m_freeMemList{};
+		char* m_memEnd{};
 };
 
 
-/*
-  My replacement for c++ new[] function (Allocate storage space for array)
-  Tried to squeeze 3 different overloads into 1 function definition
+/************************************************************************/ /*!
+\ brief
+My replacement for c++ new[] function (Allocate storage space for array)
+	Tried to squeeze 3 different overloads into 1 function definition
 
-  1.  Reserve<int, size>()
-	  - all the objects in the array will be default constructed
+	1.  Reserve<int, size>()
+		- all the objects in the array will be default constructed
 
-  2.  Reserve<int>(initializerList)
-	  - size of array  equal to size of initializer_list.
-	  - Copy everything in init_list to array
+	2.  Reserve<int>(initializerList)
+		- size of array  equal to size of initializer_list.
+		- Copy everything in init_list to array
 
-  3.  Reserve<int, size>(initializerList)
-	  - ONLY DO THIS IF YOUR ACTUAL ARRAY IS BIGGER THAN THE INITIALIZER LIST
-	  - size of array equal to size entered in the "< >" angle braces.
-	  - Copy everything in init_list to array, any empty slots left in the array will be filled with default constructed object
+	3.  Reserve<int, size>(initializerList)
+		- ONLY DO THIS IF YOUR ACTUAL ARRAY IS BIGGER THAN THE INITIALIZER LIST
+		- size of array equal to size entered in the "< >" angle braces.
+		- Copy everything in init_list to array, any empty slots left in the array will be filled with default constructed object
+
+\param [initList]const std::initializer_list<T>&
+	reference to a initializer list
+
+\return
+ pointer to the start of the dynamic allocated memory
+
 */
-
+/************************************************************************/
 template<typename T, std::size_t sz>
 T* ListAllocator::Reserve(const std::initializer_list<T>& initList)
 {
@@ -176,11 +192,17 @@ T* ListAllocator::Reserve(const std::initializer_list<T>& initList)
 }
 
 
-/*
-	My replacement for c++ new function
-	Allocate storage space for 1 object
-	If you dont pass in any value/object inside, it will just default construct the object
+/************************************************************************/ /*!
+\ brief
+my replacement for c++ new. The function will dynamically allocate memory for 1 object.
+
+\param [object]T&
+	reference to an object
+
+\return
+ pointer to the start of the dynamic allocated memory
 */
+/************************************************************************/
 template<typename T>
 T* ListAllocator::Reserve(T& object) 
 {
@@ -265,11 +287,17 @@ T* ListAllocator::Reserve(T& object)
 }
 
 
-/*
-	My replacement for c++ new function
-	Allocate storage space for 1 object
-	If you dont pass in any value/object inside, it will just default construct the object
+/************************************************************************/ /*!
+\ brief
+my replacement for c++ new. The function will dynamically allocate memory for 1 object.
+
+\param [object]const T&
+	const reference to an object
+
+\return
+ pointer to the start of the dynamic allocated memory
 */
+/************************************************************************/
 template<typename T>
 T* ListAllocator::Reserve(const T& object)
 {
@@ -354,11 +382,16 @@ T* ListAllocator::Reserve(const T& object)
 }
 
 
-/*
-	My replacement for c++ delete function
-	Rewind the pointer in the allocator to signify that the memory is freed
-	the pointer passed in will be set to a nullptr (just like delete)
+/************************************************************************/ /*!
+\ brief
+my replacement for c++ delete. The function will "free" any memory that was previously
+allocated by the linked list allocator
+
+\param [ptr]T*&
+	pointer to the start of the allocated memory
+
 */
+/************************************************************************/
 template<typename T>
 void ListAllocator::Return(T*& ptr) noexcept 
 {

@@ -12,6 +12,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Src\Base_Allocator.cpp" />
+    <ClCompile Include="..\Src\InputManager.cpp" />
     <ClCompile Include="..\Src\Linear_Allocator.cpp" />
     <ClCompile Include="..\Src\LList_Allocator.cpp" />
     <ClCompile Include="..\Src\Main.cpp" />
@@ -23,6 +24,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\Src\Base_Allocator.hpp" />
+    <ClInclude Include="..\Src\InputManager.hpp" />
+    <ClInclude Include="..\Src\KeyCode.hpp" />
     <ClInclude Include="..\Src\Linear_Allocator.hpp" />
     <ClInclude Include="..\Src\LList_Allocator.hpp" />
     <ClInclude Include="..\Src\Memory_manager.hpp" />
@@ -103,6 +106,7 @@ xcopy "$(SolutionDir)Extern\AlphaEngine_V3.09\lib\fmodL.dll" "$(OutDir)" /s /r /
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp14</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
