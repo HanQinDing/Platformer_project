@@ -76,26 +76,17 @@ EXAMPLE ON HOW TO DEALLOCATE:
 #include <Windows.h>
 #include <sstream>
 
-namespace CustomAllocators
-{
-	ListAllocator g_listAllocator;
-	LinearAllocator g_linearAllocator;
-	bool g_useMyAllocator{ true };
-  std::vector<void*>g_arrayMem;
-  std::vector<void*>g_objMem;
-}
 
-
+using namespace GE::Memory;
 
 /************************************************************************/ /*!
 \ brief
 Initialize all the Allocators in the memory manager.
 */
 /************************************************************************/
-void InitializeAllAlocators()
+void MemoryManager::InitializeAllAlocators(int listSize)
 {
-	CustomAllocators::g_linearAllocator.Initialise(100);
-	CustomAllocators::g_listAllocator.Initialise(10000000);
+	g_listAllocator.Initialise(listSize);
 
 }
 
@@ -104,24 +95,21 @@ void InitializeAllAlocators()
 Free all the Allocators in the memory manager.
 */
 /************************************************************************/
-void FreeAllAlocators() 
+void MemoryManager::FreeAllAlocators()
 {
-	if (CustomAllocators::g_useMyAllocator) 
+	if (g_useMyAllocator) 
 	{
-		CustomAllocators::g_linearAllocator.PrintMemLeak();
-		CustomAllocators::g_listAllocator.PrintMemLeak();
+		g_listAllocator.PrintMemLeak();
 	}
 	else
 	{
 		PrintMemLeak();
 	}
-
-	CustomAllocators::g_linearAllocator.Free();
-	CustomAllocators::g_listAllocator.Free();
-	//for (void* v : CustomAllocators::g_arrayMem) {
+	g_listAllocator.Free();
+	//for (void* v : g_arrayMem) {
 	//	delete[] v;
 	//}
-	//for (void* v : CustomAllocators::g_objMem) {
+	//for (void* v : g_objMem) {
 	//	delete v;
 	//}
 }
@@ -133,45 +121,9 @@ void FreeAllAlocators()
 Print out the details of all the Allocators in the memory manager
 */
 /************************************************************************/
-void PrintAllDetails() 
+void MemoryManager::PrintAllDetails()
 {
-	CustomAllocators::g_linearAllocator.PrintDetails();
-	CustomAllocators::g_listAllocator.PrintDetails();
-}
-
-/************************************************************************/ /*!
-\ brief
-This function is used for testing all the allocators in the memory manager.
-It will put test objects into each allocator to test if they are working fine
-(this function is used for testing and debugging)
-*/
-/************************************************************************/
-void TestAllAllocators()
-{
-	//	auto startTime = std::chrono::high_resolution_clock::now();
-//
-//	test_Obj* test2 = new test_Obj[100];
-//	auto endTime = std::chrono::high_resolution_clock::now();
-//
-//	//int* test4 = Test_allocator.Reserve<int>({ 10 });
-//
-//	
-//
-//	test_Obj* test = Test_allocator.Reserve<test_Obj,100>();
-//	auto endTime2 = std::chrono::high_resolution_clock::now();
-//
-//	Test_allocator.Print_List();
-//
-////	test_Obj* test5 = Test_allocator.Reserve<test_Obj, 100>();
-//
-//
-//
-//	auto first_duration = std::chrono::duration_cast<std::chrono::microseconds>(endTime - startTime);
-//	auto second_duration = std::chrono::duration_cast<std::chrono::microseconds>(endTime2 - endTime);
-//
-//	std::cout << sizeof(test_Obj);
-//	std::cout << "ALLOCATOR TIME: " << second_duration.count() << "\n";
-//	std::cout << "NEW TIME: " << first_duration.count() << "\n\n\n";
+	g_listAllocator.PrintDetails();
 }
 
 /************************************************************************/ /*!
@@ -183,20 +135,20 @@ In the event that the custom allocator does not work properly, we will go back t
 	bool variable to determine whether to use our custom allocator or go back to std::allocator (new, delete)
 */
 /************************************************************************/
-void ChangeAllocator(bool useCustomAllocator) 
+void MemoryManager::ChangeAllocator(bool useCustomAllocator)
 {
-	CustomAllocators::g_useMyAllocator = useCustomAllocator;
+	g_useMyAllocator = useCustomAllocator;
 }
 
-void AddMemStd(void* ptr, bool isArray) 
+void MemoryManager::AddMemStd(void* ptr, bool isArray)
 {
 	if (isArray) 
 	{
-		CustomAllocators::g_arrayMem.push_back(ptr);
+		g_arrayMem.push_back(ptr);
 	}
 	else 
 	{
-		CustomAllocators::g_objMem.push_back(ptr);
+		g_objMem.push_back(ptr);
 	}
 }
 
@@ -211,20 +163,20 @@ Checks if the memory is for an array or an object
  bool variable to determine whether to the memory is for an array or an object
 */
 /************************************************************************/
-bool isArrayMem(void* ptr) 
+bool MemoryManager::isArrayMem(void* ptr)
 {
 
 	//Check if the ptr is an Array ptr
-	std::vector<void*>::iterator it{ std::find(CustomAllocators::g_arrayMem.begin(), CustomAllocators::g_arrayMem.end(), ptr) };
+	std::vector<void*>::iterator it{ std::find(g_arrayMem.begin(), g_arrayMem.end(), ptr) };
 
-	if (it != CustomAllocators::g_arrayMem.end()) 
+	if (it != g_arrayMem.end()) 
 	{
-		CustomAllocators::g_arrayMem.erase(it);
+		g_arrayMem.erase(it);
 		return true;
 	}
 
-	it = std::find(CustomAllocators::g_objMem.begin(), CustomAllocators::g_objMem.end(), ptr);
-	CustomAllocators::g_objMem.erase(it);
+	it = std::find(g_objMem.begin(), g_objMem.end(), ptr);
+	g_objMem.erase(it);
 	return false;
 }
 
@@ -234,22 +186,65 @@ bool isArrayMem(void* ptr)
 Prints out the details of the memory leaks if any.
 */
 /************************************************************************/
-void PrintMemLeak()
+void MemoryManager::PrintMemLeak()
 {
-	if ((CustomAllocators::g_arrayMem.size() != 0) || (CustomAllocators::g_objMem.size() != 0))
+	if ((g_arrayMem.size() != 0) || (g_objMem.size() != 0))
 	{
 		OutputDebugStringA("\n std::Allocator Mem Leak:\n");
 		OutputDebugStringA("---------------------------------------------\n");
-		if (CustomAllocators::g_arrayMem.size() != 0)
+		if (g_arrayMem.size() != 0)
 		{ // We will print mem leak details if required
-			std::string output = "Number of Arrays not free: " + std::to_string(CustomAllocators::g_arrayMem.size()) + "\n";
+			std::string output = "Number of Arrays not free: " + std::to_string(g_arrayMem.size()) + "\n";
 			OutputDebugStringA(output.c_str());
 		}
-		if (CustomAllocators::g_objMem.size() != 0)
+		if (g_objMem.size() != 0)
 		{ // We will print mem leak details if required
-			std::string output = "Number of Objects not free: " + std::to_string(CustomAllocators::g_objMem.size()) + "\n";
+			std::string output = "Number of Objects not free: " + std::to_string(g_objMem.size()) + "\n";
 			OutputDebugStringA(output.c_str());
 		}
 		OutputDebugStringA("----------------------------------------------\n\n");
 	}
+}
+
+
+
+/************************************************************************/ /*!
+\ brief
+This function is used for testing all the allocators in the memory manager.
+It will put test objects into each allocator to test if they are working fine
+(this function is used for testing and debugging)
+*/
+/************************************************************************/
+void MemoryManager::TestAllAllocators()
+{
+
+
+	MemoryManager* mm = &MemoryManager::GetInstance();
+	auto startTime = std::chrono::high_resolution_clock::now();
+
+
+	int* testint = mm->Reserve(1);
+	double* testd = mm->Reserve<double>(1.0);
+	TestObject* testt = mm->Reserve<TestObject, 100>();
+
+	auto endTime = std::chrono::high_resolution_clock::now();
+
+	auto first_duration = std::chrono::duration_cast<std::chrono::microseconds>(endTime - startTime);
+
+	//auto startTime2 = std::chrono::high_resolution_clock::now();
+	//int* testint2 = new int(1);
+	//double* testd2 = new double(1.0);
+	//TestObject* testt2 = new TestObject[100];
+	//auto endTime2 = std::chrono::high_resolution_clock::now();
+	//auto second_duration = std::chrono::duration_cast<std::chrono::microseconds>(endTime2 - startTime2);
+	//std::cout << "Time needed for std::allocator to allocate memory (Mircoseconds)" << second_duration.count() << "\n\n\n";
+
+	std::cout << "\nTime needed for my allocator to allocate memory (Mircoseconds)" << first_duration.count() << "\n";
+	mm->PrintAllDetails();
+
+	mm->Return(testint);
+	mm->Return(testd);
+	mm->Return(testt);
+	std::cout << "\nAfter Deallcoation\n\n";
+	mm->PrintAllDetails();
 }

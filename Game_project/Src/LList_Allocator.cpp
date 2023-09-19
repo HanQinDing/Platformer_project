@@ -23,7 +23,9 @@ and initializer all the data members
 */
 /************************************************************************/
 void ListAllocator::Initialise(std::size_t sz) noexcept {
-	BaseAllocator::m_start = new void* [sz];
+	BaseAllocator::m_originalStart = new void* [sz];
+	size_t alignment = sizeof(double);
+	m_start = std::align(alignment, alignment, m_originalStart, sz);
 	m_memEnd = reinterpret_cast<char*>(BaseAllocator::m_start) + sz;
 	m_freeMemList = static_cast<FreeBlock*>(BaseAllocator::m_start);
 	m_freeMemList->m_next = nullptr;
@@ -31,8 +33,8 @@ void ListAllocator::Initialise(std::size_t sz) noexcept {
 	BaseAllocator::m_size = sz;
 	BaseAllocator::m_usedBytes = 0;
 	BaseAllocator::m_numAllocations = 0;
-	std::cout << "Free Block Header Size: " << sizeof(FreeBlock) << "\n";
-	std::cout << "Allocated Block Header Size: " << sizeof(AllocatedBlock) << "\n";
+	//std::cout << "Free Block Header Size: " << sizeof(FreeBlock) << "\n";
+	//std::cout << "Allocated Block Header Size: " << sizeof(AllocatedBlock) << "\n";
 }
 
 /************************************************************************/ /*!
@@ -96,5 +98,6 @@ Free/delete the memory thats wa previously allocated/reserved at the start.
 */
 /************************************************************************/
 void ListAllocator::Free() {
-	delete[] BaseAllocator::m_start;
+	BaseAllocator::m_start = nullptr;
+	delete[] BaseAllocator::m_originalStart;
 }

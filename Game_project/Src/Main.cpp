@@ -8,6 +8,7 @@
 #include "Stance_manager.hpp"
 #include "Graphics_manager.hpp"
 #include <crtdbg.h>
+#include "Memory_manager.hpp"
 
 
 // ---------------------------------------------------------------------------
@@ -45,14 +46,18 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	//Stance_mgr::Load_all_stance();
 
 	//// Game Loop
+	/// 
+	/// 
+	GE::Memory::MemoryManager* mm = &(GE::Memory::MemoryManager::GetInstance());
+	mm->InitializeAllAlocators(10000);
 
 
-	InitializeAllAlocators();
-	ChangeAllocator(false);
-	int* test = Reserve<int>({});
-	int* test2 = Reserve<int, 20>();
-	float* test3 = Reserve<float, 1000>();
-	FreeAllAlocators();
+	//ChangeAllocator(false);
+	mm->TestAllAllocators();
+	while (true) {
+
+	}
+	mm->FreeAllAlocators();
 	// 
 	// free the system
 	AESysExit();

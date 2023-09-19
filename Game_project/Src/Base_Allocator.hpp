@@ -40,7 +40,10 @@ class BaseAllocator
 	protected:
 		std::size_t m_size{};
 		std::size_t m_usedBytes{};
+		std::size_t m_align_padding{};
 		std::size_t m_numAllocations{};
 
+
 		void* m_start;
+		void* m_originalStart;
 };
